@@ -5,16 +5,16 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-//注解自己创建users库
+//@Document注解自己创建users库 指定这个类到mongodb中的users集合自动创建
 @Document(collection="users")
 public class User {
 
-	@Id     //主键
+	@Id     //主键:唯一 不能为null 建索引
 	private String id;
 
 	private int status;
 
-	//这个字段创建索引
+	//@Indexed注解这个字段创建索引 unique = true 唯一
 	@Indexed(unique = true)
 	private String phoneNum;
 

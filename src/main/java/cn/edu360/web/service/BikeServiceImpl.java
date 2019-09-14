@@ -2,8 +2,15 @@ package cn.edu360.web.service;
 
 import cn.edu360.web.dao.mapper.BikeMapper;
 import cn.edu360.web.pojo.Bike;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.geo.GeoResults;
+import org.springframework.data.geo.Metrics;
+import org.springframework.data.geo.Point;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.NearQuery;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,4 +53,13 @@ public class BikeServiceImpl implements BikeService {
 		bikeMapper.update(Bike);
 	}
 
+	@Override
+	public GeoResults<Bike> findNear(double longitude, double latitude) {
+		//查找附近200米的未使用的单车,要求只显示最近的10辆
+		NearQuery nearQuery = NearQuery.near(longitude,latitude,Metrics.KILOMETERS);
+		nearQuery.maxDistance(0.2).query(new Query().addCriteria(Criteria.where("status").is(0)).limit(10));
+		//GeoResults 不但封装了要查找的单车数据,还封装了距离
+		GeoResults<Bike> bikes = mongoTemplate.geoNear(nearQuery, Bike.class);
+		return bikes;
+	}
 }

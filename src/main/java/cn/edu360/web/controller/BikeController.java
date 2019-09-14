@@ -5,6 +5,7 @@ import cn.edu360.web.service.BikeService;
 import cn.edu360.web.service.UserService;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.geo.GeoResults;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,6 +37,7 @@ public class BikeController {
 	@PostMapping("/bike")
 	@ResponseBody
 	public String add(@RequestBody String bike) {
+		//@RequestBody 接收的是json 然后转换成一个对象
 		Bike b = JSONObject.parseObject(bike, Bike.class);
 		bikeService.save(b);
 		return "success";
@@ -61,10 +63,17 @@ public class BikeController {
 		return bikeService.getById(id);
 	}
 
+    /**
+     * 查找当前坐标附近的单车
+     * @param longitude
+     * @param latitude
+     * @return
+     */
 	@GetMapping("/bikes")
 	@ResponseBody
-	public List<Bike> findAll() {
-		return bikeService.findAll();
+	public GeoResults<Bike> findNear(double longitude, double latitude) {
+        GeoResults<Bike> bikes = bikeService.findNear(longitude, latitude);
+        return bikes;
 	}
 
 }
